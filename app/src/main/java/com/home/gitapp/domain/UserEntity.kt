@@ -1,4 +1,4 @@
-package com.home.gitapp
+package com.home.gitapp.domain
 
 data class UserEntity(
     val login: String,

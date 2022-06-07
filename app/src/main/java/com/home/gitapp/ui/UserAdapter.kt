@@ -1,8 +1,9 @@
-package com.home.gitapp
+package com.home.gitapp.ui
 
 import android.annotation.SuppressLint
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.home.gitapp.domain.UserEntity
 
 class UserAdapter : RecyclerView.Adapter<UserViewHolder>() {
 
