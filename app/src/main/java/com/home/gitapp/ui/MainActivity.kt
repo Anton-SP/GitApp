@@ -2,48 +2,53 @@ package com.home.gitapp.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.viewModels
+import androidx.core.view.isVisible
+import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.home.gitapp.app
+import com.home.gitapp.UsersViewModel
+import com.home.gitapp.data.NetUserRepoImp
 import com.home.gitapp.databinding.ActivityMainBinding
-import com.home.gitapp.domain.UserEntity
-import com.home.gitapp.domain.UserRepo
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val adapter = UserAdapter()
-    private val usersRepo:UserRepo by lazy { app.userRepo}
+
+    private val userViewModel: UsersViewModel by viewModels{
+        UsersViewModel.UsersViewModelFactory(NetUserRepoImp())
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-
-
         initViews()
-
         initRecycleView()
-
     }
 
     private fun initViews() {
         binding.mainActivityRefreshButton.setOnClickListener {
-            Snackbar.make(binding.root, "Test Click", Snackbar.LENGTH_SHORT).show()
             loadData()
         }
     }
 
     private fun loadData() {
-        usersRepo.getUsers(
-            onSuccess = {onDataLoaded(it)},
-            onError = {onError(it)}
-        )
+        showProgress(true)
+        userViewModel.requestUserList()
+        onDataLoaded()
     }
 
-    private fun onDataLoaded(data: List<UserEntity>) {
-        adapter.setData(data)
+    private fun onDataLoaded () {
+        this.lifecycle.coroutineScope.launchWhenStarted {
+            userViewModel.userList.collect(){ userList ->
+                adapter.setData(userList)
+                showProgress(false)
+            }
+        }
     }
 
     private fun onError(throwable: Throwable){
@@ -53,5 +58,10 @@ class MainActivity : AppCompatActivity() {
     private fun initRecycleView() {
         binding.mainActivityRecycle.layoutManager = LinearLayoutManager(this)
         binding.mainActivityRecycle.adapter = adapter
+    }
+
+    private fun showProgress(inProgress:Boolean){
+        binding.mainActivityProgressBar.isVisible = inProgress
+        binding.mainActivityRecycle.isVisible= !inProgress
     }
 }
