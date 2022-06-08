@@ -11,7 +11,9 @@ class FakeUsersRepoImp:UserRepo {
         UserEntity("pjhyett", 3, "https://avatars.githubusercontent.com/u/3?v=4","user",false)
     )
 
-    override fun getUsers(onSuccess: (List<UserEntity>) -> Unit, onError: ((Throwable) -> Unit)?) {
-        onSuccess(data)
+    override suspend fun getUsers(onSuccess: (List<UserEntity>) -> Unit, onError: ((Throwable) -> Unit)?) {
+        onSuccess(getNetData())
     }
+
+    override suspend fun getNetData(): List<UserEntity> = data
 }
