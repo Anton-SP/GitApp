@@ -2,6 +2,7 @@ package com.home.gitapp.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.lifecycle.coroutineScope
@@ -16,7 +17,10 @@ import com.home.gitapp.domain.UserEntity
 class MainActivity : AppCompatActivity(), UserContract.View {
     private lateinit var binding: ActivityMainBinding
 
-    private val adapter = UserAdapter()
+    private val adapter = UserAdapter { user ->
+        Snackbar.make(binding.root, user.login, Snackbar.LENGTH_SHORT).show()
+
+    }
 
     private val userViewModel: UsersViewModel by viewModels {
         UsersViewModel.UsersViewModelFactory(NetUserRepoImp())
