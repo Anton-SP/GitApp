@@ -1,4 +1,4 @@
-package com.home.gitapp
+package com.home.gitapp.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+
 
 class UsersViewModel(val repository: UserRepo) : ViewModel() {
 

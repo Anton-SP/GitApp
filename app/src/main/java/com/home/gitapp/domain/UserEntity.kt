@@ -1,7 +1,10 @@
 package com.home.gitapp.domain
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class UserEntity(
 
     @SerializedName("login")
@@ -18,4 +21,4 @@ data class UserEntity(
 
     @SerializedName("site_admin")
     val siteAdmin: Boolean
-)
+) : Parcelable
