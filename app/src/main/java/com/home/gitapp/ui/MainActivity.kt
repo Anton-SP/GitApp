@@ -1,8 +1,8 @@
 package com.home.gitapp.ui
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.lifecycle.coroutineScope
@@ -12,14 +12,20 @@ import com.home.gitapp.app
 import com.home.gitapp.data.NetUserRepoImp
 import com.home.gitapp.databinding.ActivityMainBinding
 import com.home.gitapp.domain.UserEntity
+import com.home.gitapp.ui.user.UserDetailActivity
 
+const val DETAIL_USER = "DETAIL_USER"
 
 class MainActivity : AppCompatActivity(), UserContract.View {
     private lateinit var binding: ActivityMainBinding
 
     private val adapter = UserAdapter { user ->
-        Snackbar.make(binding.root, user.login, Snackbar.LENGTH_SHORT).show()
 
+        Snackbar.make(binding.root, user.login, Snackbar.LENGTH_SHORT).show()
+        val intent = Intent(this.app, UserDetailActivity::class.java).apply {
+            putExtra(DETAIL_USER, user)
+        }
+        startActivity(intent)
     }
 
     private val userViewModel: UsersViewModel by viewModels {
@@ -27,7 +33,6 @@ class MainActivity : AppCompatActivity(), UserContract.View {
     }
 
     private lateinit var presenter: UserContract.Presenter
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +45,7 @@ class MainActivity : AppCompatActivity(), UserContract.View {
 
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onRetainCustomNonConfigurationInstance(): UserContract.Presenter? {
         return presenter
     }
