@@ -1,4 +1,4 @@
-package com.home.gitapp.ui
+package com.home.gitapp.ui.users
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -23,8 +23,8 @@ class UserViewHolder(
     }
 
     fun bind(userEntity: UserEntity) {
-        binding.userItemAvatar.load(userEntity.avatarUrl)
-        binding.userItemId.text = userEntity.id.toString()
-        binding.userItemLogin.text = userEntity.login
+        binding.userAvatarImageView.load(userEntity.avatarUrl)
+        binding.userIdTextView.text = userEntity.id.toString()
+        binding.userLoginTextView.text = userEntity.login
     }
 }

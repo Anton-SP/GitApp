@@ -1,4 +1,4 @@
-package com.home.gitapp.ui
+package com.home.gitapp.ui.users
 
 import com.home.gitapp.domain.UserEntity
 
@@ -9,7 +9,7 @@ interface UserContract {
 
         fun showError(throwable: Throwable)
 
-        fun showPorgress(inProgress: Boolean)
+        fun showProgress(inProgress: Boolean)
     }
 
     interface Presenter {

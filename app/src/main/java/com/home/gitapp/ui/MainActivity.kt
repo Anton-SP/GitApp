@@ -1,18 +1,21 @@
 package com.home.gitapp.ui
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.home.gitapp.app
-import com.home.gitapp.data.NetUserRepoImp
 import com.home.gitapp.databinding.ActivityMainBinding
 import com.home.gitapp.domain.UserEntity
-import com.home.gitapp.ui.user.UserDetailActivity
+import com.home.gitapp.ui.profile.ProfileActivity
+import com.home.gitapp.ui.users.UserAdapter
+import com.home.gitapp.ui.users.UserContract
+import com.home.gitapp.ui.users.UserPresenter
+import com.home.gitapp.ui.users.UsersViewModel
 
 const val DETAIL_USER = "DETAIL_USER"
 
@@ -22,14 +25,14 @@ class MainActivity : AppCompatActivity(), UserContract.View {
     private val adapter = UserAdapter { user ->
 
         Snackbar.make(binding.root, user.login, Snackbar.LENGTH_SHORT).show()
-        val intent = Intent(this.app, UserDetailActivity::class.java).apply {
+        val intent = Intent(this.app, ProfileActivity::class.java).apply {
             putExtra(DETAIL_USER, user)
         }
         startActivity(intent)
     }
 
     private val userViewModel: UsersViewModel by viewModels {
-        UsersViewModel.UsersViewModelFactory(NetUserRepoImp())
+        UsersViewModel.UsersViewModelFactory(app.userRepo)
     }
 
     private lateinit var presenter: UserContract.Presenter
@@ -85,7 +88,7 @@ class MainActivity : AppCompatActivity(), UserContract.View {
         Snackbar.make(binding.root, throwable.message.toString(), Snackbar.LENGTH_SHORT).show()
     }
 
-    override fun showPorgress(inProgress: Boolean) {
+    override fun showProgress(inProgress: Boolean) {
         binding.mainActivityProgressBar.isVisible = inProgress
         binding.mainActivityRecycle.isVisible = !inProgress
     }

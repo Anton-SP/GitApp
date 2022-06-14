@@ -1,4 +1,4 @@
-package com.home.gitapp.ui
+package com.home.gitapp.ui.users
 
 import android.annotation.SuppressLint
 import android.view.ViewGroup
@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.home.gitapp.domain.UserEntity
 
 class UserAdapter(
-    private val onItemClick:(UserEntity) -> Unit
+    private val onItemClick: (UserEntity) -> Unit
 ) : RecyclerView.Adapter<UserViewHolder>() {
 
     private val data = mutableListOf<UserEntity>()
@@ -20,7 +20,7 @@ class UserAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        UserViewHolder(parent){
+        UserViewHolder(parent) {
             onItemClick(data[it])
         }
 
@@ -33,7 +33,7 @@ class UserAdapter(
     override fun getItemCount() = data.size
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setData(users: List<UserEntity>){
+    fun setData(users: List<UserEntity>) {
         data.clear()
         data.addAll(users)
         notifyDataSetChanged()

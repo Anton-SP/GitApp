@@ -1,4 +1,4 @@
-package com.home.gitapp.ui
+package com.home.gitapp.ui.users
 
 
 import com.home.gitapp.domain.UserEntity
@@ -18,7 +18,7 @@ class UserPresenter(
 
     override fun attach(view: UserContract.View) {
         this.view = view
-        view.showPorgress(inProgress)
+        view.showProgress(inProgress)
         userList?.let { view.showUsers(it) }
     }
 
@@ -31,10 +31,10 @@ class UserPresenter(
     }
 
     private suspend fun loadData() {
-        view?.showPorgress(true)
+        view?.showProgress(true)
         inProgress = true
         userRepo.getNetData().let {
-            view?.showPorgress(false)
+            view?.showProgress(false)
             view?.showUsers(it)
             userList = it
             inProgress = false

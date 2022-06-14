@@ -1,11 +1,11 @@
-package com.home.gitapp.ui.user
+package com.home.gitapp.ui.profile
 
 import com.home.gitapp.domain.UserEntity
 
-interface UserDetailContract {
+interface ProfileContract {
 
     interface View {
-        fun showUserDetail(user:UserEntity)
+        fun showUserDetail(user: UserEntity)
     }
 
     interface Presenter {

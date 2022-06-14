@@ -1,4 +1,4 @@
-package com.home.gitapp.ui
+package com.home.gitapp.ui.users
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -24,7 +24,8 @@ class UsersViewModel(val repository: UserRepo) : ViewModel() {
     }
 
     class UsersViewModelFactory(private val repository: UserRepo) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T = UsersViewModel(repository) as T
+        override fun <T : ViewModel> create(modelClass: Class<T>): T =
+            UsersViewModel(repository) as T
     }
 }
 
