@@ -2,6 +2,7 @@ package com.home.gitapp.data
 
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.domain.UserRepo
+import retrofit2.Call
 
 class FakeUsersRepoImp : UserRepo {
 
@@ -11,12 +12,12 @@ class FakeUsersRepoImp : UserRepo {
         UserEntity("pjhyett", 3, "https://avatars.githubusercontent.com/u/3?v=4", "user", false)
     )
 
-    override suspend fun getUsers(
+    override  fun getUsers(
         onSuccess: (List<UserEntity>) -> Unit,
         onError: ((Throwable) -> Unit)?
     ) {
-        onSuccess(getNetData())
+        onSuccess(data)
     }
 
-    override suspend fun getNetData(): List<UserEntity> = data
+
 }

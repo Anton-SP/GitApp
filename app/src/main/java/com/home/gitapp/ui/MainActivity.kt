@@ -19,7 +19,7 @@ import com.home.gitapp.ui.users.UsersViewModel
 
 const val DETAIL_USER = "DETAIL_USER"
 
-class MainActivity : AppCompatActivity(), UserContract.View {
+class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val adapter = UserAdapter { user ->
@@ -31,11 +31,12 @@ class MainActivity : AppCompatActivity(), UserContract.View {
         startActivity(intent)
     }
 
-    private val userViewModel: UsersViewModel by viewModels {
+    private lateinit var userViewModel:UserContract.ViewModel
+  /*  private val userViewModel: UsersViewModel by viewModels {
         UsersViewModel.UsersViewModelFactory(app.userRepo)
-    }
+    }*/
 
-    private lateinit var presenter: UserContract.Presenter
+  //  private lateinit var presenter: UserContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
