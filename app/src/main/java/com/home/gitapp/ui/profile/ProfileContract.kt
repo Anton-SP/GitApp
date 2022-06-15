@@ -1,18 +1,14 @@
 package com.home.gitapp.ui.profile
 
+import androidx.lifecycle.LiveData
 import com.home.gitapp.domain.UserEntity
 
 interface ProfileContract {
 
-    interface View {
-        fun showUserDetail(user: UserEntity)
+    interface ViewModel {
+        val profileLiveData: LiveData<UserEntity>
+
+        fun setProfile()
     }
 
-    interface Presenter {
-        fun attach(view: View)
-
-        fun detach()
-
-        fun loadData()
-    }
 }

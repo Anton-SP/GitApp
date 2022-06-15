@@ -3,38 +3,47 @@ package com.home.gitapp.ui.profile
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import coil.load
+import com.home.gitapp.app
 import com.home.gitapp.databinding.ActivityProfileBinding
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.ui.DETAIL_USER
 
-class ProfileActivity : AppCompatActivity(), ProfileContract.View {
+class ProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityProfileBinding
 
-    private lateinit var presenter: ProfileContract.Presenter
-
     private lateinit var user: UserEntity
+
+    private lateinit var profileViewModel: ProfileContract.ViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         intent.getParcelableExtra<UserEntity>(DETAIL_USER)?.let { user = it }
-
-        presenter = extractPresenter()
-        presenter.attach(this)
-
+        initViewModel()
         initView(user)
 
     }
 
-    private fun initView(user: UserEntity?) {
-        user?.let { showUserDetail(it) }
+    private fun initViewModel() {
+        profileViewModel = getViewModel()
     }
 
-    override fun showUserDetail(user: UserEntity) {
+    private fun getViewModel(): ProfileContract.ViewModel {
+        return lastCustomNonConfigurationInstance as? ProfileContract.ViewModel
+            ?: ProfileViewModel(user)
+    }
 
+    override fun onRetainCustomNonConfigurationInstance(): ProfileContract.ViewModel {
+        return profileViewModel
+    }
+
+    private fun initView(user: UserEntity?) {
+        user?.let { showUserProfile(it) }
+    }
+
+    private fun showUserProfile(user: UserEntity) {
         binding.apply {
             profileAvatarImageView.load(user?.avatarUrl)
             profileLoginTextView.text = user?.login
@@ -44,13 +53,4 @@ class ProfileActivity : AppCompatActivity(), ProfileContract.View {
     }
 
 
-    private fun extractPresenter(): ProfileContract.Presenter {
-        return lastCustomNonConfigurationInstance as? ProfileContract.Presenter
-            ?: ProfilePresenter(user)
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onRetainCustomNonConfigurationInstance(): ProfileContract.Presenter? {
-        return presenter
-    }
 }

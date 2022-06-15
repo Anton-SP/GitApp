@@ -1,4 +1,4 @@
-package com.home.gitapp.data
+package com.home.gitapp.data.retrofit
 
 import com.home.gitapp.data.retrofit.GithubApi
 import com.home.gitapp.domain.UserEntity
@@ -19,6 +19,7 @@ private val gitApi = Retrofit.Builder()
 
 
 class NetUserRepoImp : UserRepo {
+
     override fun getUsers(onSuccess: (List<UserEntity>) -> Unit, onError: ((Throwable) -> Unit)?) {
        gitApi.getNetData().enqueue(object : Callback<List<UserEntity>> {
            override fun onResponse(
