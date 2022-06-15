@@ -7,4 +7,5 @@ import retrofit2.http.GET
 interface GithubApi {
     @GET("users")
     fun getNetData(): Call<List<UserEntity>>
+
 }
