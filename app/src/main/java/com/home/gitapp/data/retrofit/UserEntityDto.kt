@@ -21,19 +21,18 @@ data class UserEntityDto(
 
     @SerializedName("site_admin")
     val siteAdmin: Boolean
-) : Parcelable
- {
-     fun convertDtoToUserEntity() = UserEntity(login,id,avatarUrl,type,siteAdmin)
+) : Parcelable {
+    fun convertDtoToUserEntity() = UserEntity(login, id, avatarUrl, type, siteAdmin)
 
-     companion object {
-         fun convertUserEntityToDto (userEntity: UserEntity):UserEntityDto {
-             return UserEntityDto(
-                 userEntity.login,
-                 userEntity.id,
-                 userEntity.avatarUrl,
-                 userEntity.type,
-                 userEntity.siteAdmin
-             )
-         }
-     }
+    companion object {
+        fun convertUserEntityToDto(userEntity: UserEntity): UserEntityDto {
+            return UserEntityDto(
+                userEntity.login,
+                userEntity.id,
+                userEntity.avatarUrl,
+                userEntity.type,
+                userEntity.siteAdmin
+            )
+        }
+    }
 }

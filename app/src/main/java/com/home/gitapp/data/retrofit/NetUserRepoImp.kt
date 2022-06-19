@@ -2,15 +2,16 @@ package com.home.gitapp.data.retrofit
 
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.domain.UserRepo
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import okhttp3.OkHttpClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 private val gitApi = Retrofit.Builder()
     .addConverterFactory(GsonConverterFactory.create())
+    .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
     .baseUrl("https://api.github.com/")
     .client(OkHttpClient.Builder().build())
     .build()
@@ -20,25 +21,21 @@ private val gitApi = Retrofit.Builder()
 class NetUserRepoImp : UserRepo {
 
     override fun getUsers(onSuccess: (List<UserEntity>) -> Unit, onError: ((Throwable) -> Unit)?) {
-        gitApi.getNetData().enqueue(object : Callback<List<UserEntityDto>> {
-            override fun onResponse(
-                call: Call<List<UserEntityDto>>,
-                response: Response<List<UserEntityDto>>
-            ) {
-                val body = response.body()
-                if (response.isSuccessful && body != null) {
-                    onSuccess.invoke(body.map { it.convertDtoToUserEntity() })
-                } else {
-                    onError?.invoke(IllegalStateException("error loading data"))
-                }
+        gitApi.getNetData().subscribeBy(
+            onSuccess = { users ->
+                onSuccess.invoke(users.map { it.convertDtoToUserEntity() })
+            },
+            onError = { error ->
+                onError?.invoke(error)
             }
+        )
 
-            override fun onFailure(call: Call<List<UserEntityDto>>, t: Throwable) {
-                onError?.invoke(t)
-            }
+    }
 
-        })
-
+    override fun getUsers(): Single<List<UserEntity>> = gitApi.getNetData().map { users ->
+        users.map {
+            it.convertDtoToUserEntity()
+        }
     }
 
 }

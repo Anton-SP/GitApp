@@ -8,6 +8,7 @@ import com.home.gitapp.data.retrofit.UserEntityDto
 import com.home.gitapp.databinding.ActivityProfileBinding
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.ui.DETAIL_USER
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 class ProfileActivity : AppCompatActivity() {
 
@@ -17,11 +18,14 @@ class ProfileActivity : AppCompatActivity() {
 
     private lateinit var profileViewModel: ProfileContract.ViewModel
 
+    private val viewModelDisposable = CompositeDisposable()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        intent.getParcelableExtra<UserEntityDto>(DETAIL_USER)?.let { user = it.convertDtoToUserEntity() }
+        intent.getParcelableExtra<UserEntityDto>(DETAIL_USER)
+            ?.let { user = it.convertDtoToUserEntity() }
         initViewModel()
         initView(user)
 
@@ -29,6 +33,16 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun initViewModel() {
         profileViewModel = getViewModel()
+
+        viewModelDisposable.addAll(
+            profileViewModel.profileLiveData.subscribe() { showUserProfile(it) }
+        )
+
+    }
+
+    override fun onDestroy() {
+        viewModelDisposable.dispose()
+        super.onDestroy()
     }
 
     private fun getViewModel(): ProfileContract.ViewModel {

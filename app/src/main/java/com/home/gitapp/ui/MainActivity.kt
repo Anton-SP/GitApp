@@ -14,6 +14,7 @@ import com.home.gitapp.ui.profile.ProfileActivity
 import com.home.gitapp.ui.users.UserAdapter
 import com.home.gitapp.ui.users.UserContract
 import com.home.gitapp.ui.users.UsersViewModel
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 const val DETAIL_USER = "DETAIL_USER"
 
@@ -21,14 +22,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val adapter = UserAdapter { user ->
-
-        val intent = Intent(this.app, ProfileActivity::class.java).apply {
-           putExtra(DETAIL_USER,  UserEntityDto.convertUserEntityToDto(user))
-        }
-        startActivity(intent)
+        userViewModel.onUserClick(user)
     }
 
     private lateinit var userViewModel: UserContract.ViewModel
+
+    private val viewModelDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,16 +35,32 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         initViews()
         initViewModel()
+
     }
 
     private fun initViewModel() {
         userViewModel = getViewModel()
 
-        userViewModel.progressLiveData.observe(this) { showProgress(it) }
+        viewModelDisposable.addAll(
 
-        userViewModel.usersLiveData.observe(this) { showUsers(it) }
+            userViewModel.progressLiveData.subscribe() { showProgress(it) },
+            userViewModel.usersLiveData.subscribe() { showUsers(it) },
+            userViewModel.errorLiveData.subscribe() { showError(it) },
+            userViewModel.openProfileLiveData.subscribe() { openProfileScreen(it) }
+        )
 
-        userViewModel.errorLiveData.observe(this) { showError(it) }
+    }
+
+    override fun onDestroy() {
+        viewModelDisposable.dispose()
+        super.onDestroy()
+    }
+
+    private fun openProfileScreen(userEntity: UserEntity) {
+          val intent = Intent(this.app, ProfileActivity::class.java).apply {
+             putExtra(DETAIL_USER, UserEntityDto.convertUserEntityToDto(userEntity))
+         }
+         startActivity(intent)
     }
 
     private fun getViewModel(): UserContract.ViewModel {
