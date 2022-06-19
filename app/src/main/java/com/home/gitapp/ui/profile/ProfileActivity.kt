@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import coil.load
 import com.home.gitapp.app
+import com.home.gitapp.data.retrofit.UserEntityDto
 import com.home.gitapp.databinding.ActivityProfileBinding
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.ui.DETAIL_USER
@@ -20,7 +21,7 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        intent.getParcelableExtra<UserEntity>(DETAIL_USER)?.let { user = it }
+        intent.getParcelableExtra<UserEntityDto>(DETAIL_USER)?.let { user = it.convertDtoToUserEntity() }
         initViewModel()
         initView(user)
 

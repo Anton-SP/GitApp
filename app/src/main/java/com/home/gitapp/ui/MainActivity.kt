@@ -7,6 +7,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.home.gitapp.app
+import com.home.gitapp.data.retrofit.UserEntityDto
 import com.home.gitapp.databinding.ActivityMainBinding
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.ui.profile.ProfileActivity
@@ -22,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     private val adapter = UserAdapter { user ->
 
         val intent = Intent(this.app, ProfileActivity::class.java).apply {
-           putExtra(DETAIL_USER, user)
+           putExtra(DETAIL_USER,  UserEntityDto.convertUserEntityToDto(user))
         }
         startActivity(intent)
     }

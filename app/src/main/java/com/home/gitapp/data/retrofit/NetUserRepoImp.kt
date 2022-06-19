@@ -1,6 +1,5 @@
 package com.home.gitapp.data.retrofit
 
-import com.home.gitapp.data.retrofit.GithubApi
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.domain.UserRepo
 import okhttp3.OkHttpClient
@@ -21,38 +20,25 @@ private val gitApi = Retrofit.Builder()
 class NetUserRepoImp : UserRepo {
 
     override fun getUsers(onSuccess: (List<UserEntity>) -> Unit, onError: ((Throwable) -> Unit)?) {
-       gitApi.getNetData().enqueue(object : Callback<List<UserEntity>> {
-           override fun onResponse(
-               call: Call<List<UserEntity>>,
-               response: Response<List<UserEntity>>
-           ) {
-               val body = response.body()
-               if (response.isSuccessful && body != null) {
-                   onSuccess(body)
-               } else {
-                   onError?.invoke(IllegalStateException("error loading data"))
-               }
-           }
+        gitApi.getNetData().enqueue(object : Callback<List<UserEntityDto>> {
+            override fun onResponse(
+                call: Call<List<UserEntityDto>>,
+                response: Response<List<UserEntityDto>>
+            ) {
+                val body = response.body()
+                if (response.isSuccessful && body != null) {
+                    onSuccess.invoke(body.map { it.convertDtoToUserEntity() })
+                } else {
+                    onError?.invoke(IllegalStateException("error loading data"))
+                }
+            }
 
-           override fun onFailure(call: Call<List<UserEntity>>, t: Throwable) {
-               onError?.invoke(t)
-           }
+            override fun onFailure(call: Call<List<UserEntityDto>>, t: Throwable) {
+                onError?.invoke(t)
+            }
 
-       })
+        })
 
     }
-
-
-
 
 }
-    /*
-    override fun getUsers(
-        onSuccess: (List<UserEntity>) -> Unit,
-        onError: ((Throwable) -> Unit)?
-    ) {
-        onSuccess(gitApi.getNetData())
-    }
-
-    override fun getNetData(): List<UserEntity> = gitApi.getNetData()
-}*/
