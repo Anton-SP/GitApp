@@ -29,6 +29,7 @@ class ProfileActivity : AppCompatActivity() {
         initViewModel()
         initView(user)
 
+
     }
 
     private fun initViewModel() {

@@ -2,8 +2,10 @@ package com.home.gitapp.ui.users
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.home.gitapp.data.room.UserDatabase
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.domain.UserRepo
+import com.home.gitapp.utils.convertUserEntityToDao
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -53,6 +55,12 @@ class UsersViewModel(private val repository: UserRepo) : UserContract.ViewModel 
             ?: throw IllegalStateException("It is not Mutable o_O")
     }
 
+    fun fillDB(db:UserDatabase,userList: List<UserEntity>){
+        for (user in userList) {
+            db.userDao().insert(convertUserEntityToDao(user))
+        }
+
+    }
 }
 
 

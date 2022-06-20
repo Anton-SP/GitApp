@@ -14,6 +14,7 @@ import com.home.gitapp.ui.profile.ProfileActivity
 import com.home.gitapp.ui.users.UserAdapter
 import com.home.gitapp.ui.users.UserContract
 import com.home.gitapp.ui.users.UsersViewModel
+import com.home.gitapp.utils.convertUserEntityToDao
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 const val DETAIL_USER = "DETAIL_USER"
@@ -33,6 +34,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        app.createDB()
         initViews()
         initViewModel()
 
@@ -44,7 +46,15 @@ class MainActivity : AppCompatActivity() {
         viewModelDisposable.addAll(
 
             userViewModel.progressLiveData.subscribe() { showProgress(it) },
-            userViewModel.usersLiveData.subscribe() { showUsers(it) },
+
+            userViewModel.usersLiveData.subscribe() { usersList ->
+                showUsers(usersList)
+                userViewModel.
+                 //   app.usersDB.userDao().insert(convertUserEntityToDao(user))
+
+
+            },
+
             userViewModel.errorLiveData.subscribe() { showError(it) },
             userViewModel.openProfileLiveData.subscribe() { openProfileScreen(it) }
         )
@@ -57,10 +67,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openProfileScreen(userEntity: UserEntity) {
-          val intent = Intent(this.app, ProfileActivity::class.java).apply {
-             putExtra(DETAIL_USER, UserEntityDto.convertUserEntityToDto(userEntity))
-         }
-         startActivity(intent)
+        val intent = Intent(this.app, ProfileActivity::class.java).apply {
+            putExtra(DETAIL_USER, UserEntityDto.convertUserEntityToDto(userEntity))
+        }
+        startActivity(intent)
     }
 
     private fun getViewModel(): UserContract.ViewModel {
