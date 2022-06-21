@@ -8,13 +8,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.home.gitapp.app
 import com.home.gitapp.data.retrofit.UserEntityDto
+import com.home.gitapp.data.room.UserDatabase
 import com.home.gitapp.databinding.ActivityMainBinding
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.ui.profile.ProfileActivity
 import com.home.gitapp.ui.users.UserAdapter
 import com.home.gitapp.ui.users.UserContract
 import com.home.gitapp.ui.users.UsersViewModel
-import com.home.gitapp.utils.convertUserEntityToDao
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 const val DETAIL_USER = "DETAIL_USER"
@@ -34,32 +34,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        app.createDB()
         initViews()
         initViewModel()
 
     }
 
-    private fun initViewModel() {
-        userViewModel = getViewModel()
-
-        viewModelDisposable.addAll(
-
-            userViewModel.progressLiveData.subscribe() { showProgress(it) },
-
-            userViewModel.usersLiveData.subscribe() { usersList ->
-                showUsers(usersList)
-                userViewModel.
-                 //   app.usersDB.userDao().insert(convertUserEntityToDao(user))
-
-
-            },
-
-            userViewModel.errorLiveData.subscribe() { showError(it) },
-            userViewModel.openProfileLiveData.subscribe() { openProfileScreen(it) }
-        )
-
-    }
 
     override fun onDestroy() {
         viewModelDisposable.dispose()
@@ -87,8 +66,29 @@ class MainActivity : AppCompatActivity() {
             userViewModel.onRefresh()
         }
         initRecycleView()
-
         showProgress(false)
+
+    }
+
+    private fun initViewModel() {
+        userViewModel = getViewModel()
+
+        viewModelDisposable.addAll(
+
+            userViewModel.progressLiveData.subscribe { showProgress(it) },
+            userViewModel.usersLiveData.subscribe {
+                showUsers(it)
+                updateLocalRepo(app.database, it)
+                                                  },
+
+            userViewModel.errorLiveData.subscribe { showError(it) },
+            userViewModel.openProfileLiveData.subscribe { openProfileScreen(it) }
+        )
+
+    }
+
+    private fun updateLocalRepo(db:UserDatabase, userList:List<UserEntity>) {
+        userViewModel.onNewData(db,userList)
     }
 
 

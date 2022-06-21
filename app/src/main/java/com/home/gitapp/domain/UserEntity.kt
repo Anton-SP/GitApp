@@ -1,5 +1,7 @@
 package com.home.gitapp.domain
 
+import com.home.gitapp.data.room.RoomUserEntity
+
 
 data class UserEntity(
 
@@ -13,3 +15,6 @@ data class UserEntity(
 
     val siteAdmin: Boolean
 )
+{
+    fun convertUserEntityToDAO() = RoomUserEntity(login, id, avatarUrl, type, siteAdmin)
+}
