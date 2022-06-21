@@ -2,10 +2,10 @@ package com.home.gitapp.ui.users
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.home.gitapp.data.retrofit.NetUserRepoImp
 import com.home.gitapp.data.room.UserDatabase
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.domain.UserRepo
-import com.home.gitapp.utils.convertUserEntityToDao
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
@@ -19,6 +19,8 @@ class UsersViewModel(
     private val repository: UserRepo
 ) : UserContract.ViewModel {
 
+    val remoteUserRepo by lazy { NetUserRepoImp() }
+
     override val usersLiveData: Observable<List<UserEntity>> = BehaviorSubject.create()
     override val errorLiveData: Observable<Throwable> = BehaviorSubject.create()
     override val progressLiveData: Observable<Boolean> = BehaviorSubject.create()
@@ -26,7 +28,30 @@ class UsersViewModel(
     override val usersCashData: Observable<List<UserEntity>> = BehaviorSubject.create()
 
     override fun onRefresh() {
-        loadData()
+        loadLocalData()
+    }
+
+    private fun loadLocalData() {
+        progressLiveData.toMutable().onNext(true)
+        repository.getUsers()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy (
+                onSuccess = { userList ->
+                    if (userList.isNotEmpty()) {
+                        progressLiveData.toMutable().onNext(false)
+                        usersLiveData.toMutable().onNext(userList)
+                    } else {
+                        loadData()
+                    }
+                },
+                onError = { error ->
+                    progressLiveData.toMutable().onNext(false)
+                    errorLiveData.toMutable().onNext(error)
+
+
+                }
+                    )
     }
 
     override fun onUserClick(userEntity: UserEntity) {
@@ -34,7 +59,7 @@ class UsersViewModel(
     }
 
     override fun onNewData(db: UserDatabase, list: List<UserEntity>) {
-        Completable.fromRunnable(){
+        Completable.fromRunnable {
             db.userDao().addUserList(list.map { it.convertUserEntityToDAO() } )
         } .subscribeOn(Schedulers.io())
             .subscribe()
@@ -43,12 +68,13 @@ class UsersViewModel(
 
     private fun loadData() {
         progressLiveData.toMutable().onNext(true)
-        repository.getUsers()
+        remoteUserRepo.getUsers()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { list ->
                     progressLiveData.toMutable().onNext(false)
                     usersLiveData.toMutable().onNext(list)
+
                 },
                 onError = { error ->
                     progressLiveData.toMutable().onNext(false)
@@ -69,12 +95,7 @@ class UsersViewModel(
             ?: throw IllegalStateException("It is not Mutable o_O")
     }
 
-    fun fillDB(db:UserDatabase,userList: List<UserEntity>){
-        for (user in userList) {
-            db.userDao().insert(convertUserEntityToDao(user))
-        }
 
-    }
 }
 
 

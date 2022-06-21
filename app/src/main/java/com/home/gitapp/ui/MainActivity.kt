@@ -2,6 +2,7 @@ package com.home.gitapp.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -79,16 +80,21 @@ class MainActivity : AppCompatActivity() {
             userViewModel.usersLiveData.subscribe {
                 showUsers(it)
                 updateLocalRepo(app.database, it)
-                                                  },
-
+            },
             userViewModel.errorLiveData.subscribe { showError(it) },
-            userViewModel.openProfileLiveData.subscribe { openProfileScreen(it) }
+            userViewModel.openProfileLiveData.subscribe { openProfileScreen(it) },
+            userViewModel.usersCashData.subscribe {
+                Toast.makeText(
+                    this,
+                    "cashdata",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         )
-
     }
 
-    private fun updateLocalRepo(db:UserDatabase, userList:List<UserEntity>) {
-        userViewModel.onNewData(db,userList)
+    private fun updateLocalRepo(db: UserDatabase, userList: List<UserEntity>) {
+        userViewModel.onNewData(db, userList)
     }
 
 
@@ -100,7 +106,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun showUsers(users: List<UserEntity>) {
         adapter.setData(users)
-
     }
 
     private fun showError(throwable: Throwable) {

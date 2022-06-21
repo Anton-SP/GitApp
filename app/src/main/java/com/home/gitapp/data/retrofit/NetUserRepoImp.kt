@@ -32,7 +32,6 @@ class NetUserRepoImp : UserRepo {
 
     }
 
-
     override fun getUsers(): Single<List<UserEntity>> = gitApi.getNetData().map { users ->
         users.map {
             it.convertDtoToUserEntity()

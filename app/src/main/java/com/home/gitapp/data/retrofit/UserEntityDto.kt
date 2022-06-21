@@ -25,7 +25,6 @@ data class UserEntityDto(
 ) : Parcelable {
 
     fun convertDtoToUserEntity() = UserEntity(login, id, avatarUrl, type, siteAdmin)
-    //fun convertDtoToRoomUserEntity() = RoomUserEntity(login, id, avatarUrl, type, siteAdmin)
 
    companion object {
         fun convertUserEntityToDto(userEntity: UserEntity): UserEntityDto {
