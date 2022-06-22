@@ -2,6 +2,7 @@ package com.home.gitapp.data.retrofit
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import com.home.gitapp.data.room.RoomUserEntity
 import com.home.gitapp.domain.UserEntity
 import kotlinx.parcelize.Parcelize
 
@@ -22,9 +23,10 @@ data class UserEntityDto(
     @SerializedName("site_admin")
     val siteAdmin: Boolean
 ) : Parcelable {
+
     fun convertDtoToUserEntity() = UserEntity(login, id, avatarUrl, type, siteAdmin)
 
-    companion object {
+   companion object {
         fun convertUserEntityToDto(userEntity: UserEntity): UserEntityDto {
             return UserEntityDto(
                 userEntity.login,

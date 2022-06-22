@@ -2,6 +2,7 @@ package com.home.gitapp.data
 
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.domain.UserRepo
+import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
 
 class FakeUsersRepoImp : UserRepo {
@@ -20,6 +21,8 @@ class FakeUsersRepoImp : UserRepo {
     }
 
     override fun getUsers(): Single<List<UserEntity>> = Single.just(data)
+
+
 
 
 }
