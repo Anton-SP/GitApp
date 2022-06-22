@@ -1,9 +1,7 @@
 package com.home.gitapp.ui
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,7 +15,6 @@ import com.home.gitapp.ui.profile.ProfileActivity
 import com.home.gitapp.ui.users.UserAdapter
 import com.home.gitapp.ui.users.UserContract
 import com.home.gitapp.ui.users.UsersViewModel
-import com.home.gitapp.utils.downloadImageBitmap
 import com.home.gitapp.utils.getImagePath
 import com.home.gitapp.utils.onLoadBitmap
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -94,24 +91,7 @@ class MainActivity : AppCompatActivity() {
 
             )
     }
-    //для дебага бд
-    /* fun setCacheData(userList:List<UserEntity>) {
-         updateLocalRepo(app.database, userList)
-     }*/
-    /*
-    неправильный но рабочий подход к сохранению данных в бд
-    а неправильнен он тем что преедаем контекст в вьюмодель -  а его там быть не должно
-    зато работает
-     */
-    /* fun setCacheData(userList: List<UserEntity>) {
-         userViewModel.onSaveImage(app, userList)
-         userViewModel.usersBitmap.subscribe { list ->
-             if (list.isNotEmpty()) {
-                 updateLocalRepo(app.database, list)
-             }
-         }
 
-     }*/
 
     fun setCacheData(userList: List<UserEntity>) {
         userViewModel.onSaveImage(userList)

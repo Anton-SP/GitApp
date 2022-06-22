@@ -20,7 +20,7 @@ import java.net.URL
 fun saveImage(context: Context, image: Bitmap, imageName: String?) {
     val foStream: FileOutputStream
     try {
-        foStream = context.openFileOutput(imageName+".png", Context.MODE_PRIVATE)
+        foStream = context.openFileOutput(imageName + ".png", Context.MODE_PRIVATE)
         image.compress(Bitmap.CompressFormat.PNG, 100, foStream)
         Log.d("HAPPY", "Save file")
         foStream.close()
@@ -30,7 +30,7 @@ fun saveImage(context: Context, image: Bitmap, imageName: String?) {
     }
 }
 
- fun downloadImageBitmap(url: String): Bitmap? {
+fun downloadImageBitmap(url: String): Bitmap? {
     var bitmap: Bitmap? = null
     try {
         val inputStream: InputStream = URL(url).openStream() // Download Image from URL
@@ -42,16 +42,18 @@ fun saveImage(context: Context, image: Bitmap, imageName: String?) {
     }
     return bitmap
 }
+
 //"my_image.png"
-fun onLoadBitmap(context:Context,result: Bitmap?,name:String) {
+fun onLoadBitmap(context: Context, result: Bitmap?, name: String) {
     saveImage(context, result!!, name)
 }
-fun getImagePath(context:Context,imageName: String):String {
+
+fun getImagePath(context: Context, imageName: String): String {
     return context.getFileStreamPath(imageName).absolutePath
 
 }
 
-private fun saveMediaToStorage(context:Context,bitmap: Bitmap?,imageName: String) {
+private fun saveMediaToStorage(context: Context, bitmap: Bitmap?, imageName: String) {
     val filename = "${imageName}.jpg"
     var outputStream: OutputStream? = null
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -61,23 +63,18 @@ private fun saveMediaToStorage(context:Context,bitmap: Bitmap?,imageName: String
                 put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg")
                 put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
             }
-            val imageUri: Uri? = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            val imageUri: Uri? =
+                resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
             outputStream = imageUri?.let { resolver.openOutputStream(it) }
         }
     } else {
-        val imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        val imagesDir =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
         val image = File(imagesDir, filename)
         outputStream = FileOutputStream(image)
     }
     outputStream?.use {
         bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, it)
-        Toast.makeText(context , "Saved to Gallery" , Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Saved to Gallery", Toast.LENGTH_SHORT).show()
     }
 }
-
-
-
-
-//////////////////
-// Function to save image on the device.
-// Refer: https://www.geeksforgeeks.org/circular-crop-an-image-and-save-it-to-the-file-in-android/
