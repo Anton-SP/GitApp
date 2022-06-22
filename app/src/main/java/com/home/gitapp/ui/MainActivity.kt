@@ -1,6 +1,7 @@
 package com.home.gitapp.ui
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,9 @@ import com.home.gitapp.ui.profile.ProfileActivity
 import com.home.gitapp.ui.users.UserAdapter
 import com.home.gitapp.ui.users.UserContract
 import com.home.gitapp.ui.users.UsersViewModel
+import com.home.gitapp.utils.downloadImageBitmap
+import com.home.gitapp.utils.getImagePath
+import com.home.gitapp.utils.onLoadBitmap
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 const val DETAIL_USER = "DETAIL_USER"
@@ -79,19 +83,61 @@ class MainActivity : AppCompatActivity() {
             userViewModel.progressLiveData.subscribe { showProgress(it) },
             userViewModel.usersLiveData.subscribe {
                 showUsers(it)
-                updateLocalRepo(app.database, it)
+                // test(it)
+            },
+            userViewModel.usersNetUpdateLiveData.subscribe {
+                showUsers(it)
+                setCacheData(it)
             },
             userViewModel.errorLiveData.subscribe { showError(it) },
             userViewModel.openProfileLiveData.subscribe { openProfileScreen(it) },
-            userViewModel.usersCashData.subscribe {
-                Toast.makeText(
-                    this,
-                    "cashdata",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        )
+
+            )
     }
+    //для дебага бд
+    /* fun setCacheData(userList:List<UserEntity>) {
+         updateLocalRepo(app.database, userList)
+     }*/
+    /*
+    неправильный но рабочий подход к сохранению данных в бд
+    а неправильнен он тем что преедаем контекст в вьюмодель -  а его там быть не должно
+    зато работает
+     */
+    /* fun setCacheData(userList: List<UserEntity>) {
+         userViewModel.onSaveImage(app, userList)
+         userViewModel.usersBitmap.subscribe { list ->
+             if (list.isNotEmpty()) {
+                 updateLocalRepo(app.database, list)
+             }
+         }
+
+     }*/
+
+    fun setCacheData(userList: List<UserEntity>) {
+        userViewModel.onSaveImage(userList)
+        userViewModel.usersBitmap.subscribe { bitmapList ->
+            var tmpUserList: MutableList<UserEntity> = mutableListOf()
+            for (i in 0..userList.size - 1) {
+                onLoadBitmap(
+                    app,
+                    bitmapList[i],
+                    userList[i].login
+                )
+                val internalPath = getImagePath(app, userList[i].login)
+                val updatedUser = UserEntity(
+                    userList[i].login,
+                    userList[i].id,
+                    "$internalPath.png",
+                    userList[i].type,
+                    userList[i].siteAdmin
+                )
+                tmpUserList.add(updatedUser)
+            }
+            updateLocalRepo(app.database, tmpUserList)
+        }
+
+    }
+
 
     private fun updateLocalRepo(db: UserDatabase, userList: List<UserEntity>) {
         userViewModel.onNewData(db, userList)

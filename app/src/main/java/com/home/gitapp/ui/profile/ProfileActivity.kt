@@ -9,6 +9,7 @@ import com.home.gitapp.databinding.ActivityProfileBinding
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.ui.DETAIL_USER
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import java.io.File
 
 class ProfileActivity : AppCompatActivity() {
 
@@ -61,7 +62,11 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun showUserProfile(user: UserEntity) {
         binding.apply {
-            profileAvatarImageView.load(user?.avatarUrl)
+
+            if (user.avatarUrl.contains("http")) {
+                profileAvatarImageView.load(user.avatarUrl)
+            } else profileAvatarImageView.load(File(user.avatarUrl))
+
             profileLoginTextView.text = user?.login
             profileIdTextView.text = user?.id.toString()
             profileTypeTextView.text = user?.type
