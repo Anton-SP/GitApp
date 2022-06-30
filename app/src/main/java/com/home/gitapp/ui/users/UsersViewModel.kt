@@ -110,6 +110,17 @@ class UsersViewModel(
     }
 
 
+/*
+
+// You can then apply all sorts of operation here
+    Subscription subscription = clickEventObservable.flatMap(*/
+/*  *//*
+);
+
+// Unsubscribe when you're done with it
+    subscription.unsubscribe();
+*/
+
 
 }
 
