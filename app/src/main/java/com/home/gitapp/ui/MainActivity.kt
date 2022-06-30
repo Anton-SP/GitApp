@@ -1,72 +1,126 @@
 package com.home.gitapp.ui
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.lifecycle.coroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.home.gitapp.app
-import com.home.gitapp.data.NetUserRepoImp
+import com.home.gitapp.data.retrofit.UserEntityDto
+import com.home.gitapp.data.room.UserDatabase
 import com.home.gitapp.databinding.ActivityMainBinding
 import com.home.gitapp.domain.UserEntity
-import com.home.gitapp.ui.user.UserDetailActivity
+import com.home.gitapp.ui.profile.ProfileActivity
+import com.home.gitapp.ui.users.UserAdapter
+import com.home.gitapp.ui.users.UserContract
+import com.home.gitapp.ui.users.UsersViewModel
+import com.home.gitapp.utils.getImagePath
+import com.home.gitapp.utils.onLoadBitmap
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 const val DETAIL_USER = "DETAIL_USER"
 
-class MainActivity : AppCompatActivity(), UserContract.View {
+class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val adapter = UserAdapter { user ->
-
-        Snackbar.make(binding.root, user.login, Snackbar.LENGTH_SHORT).show()
-        val intent = Intent(this.app, UserDetailActivity::class.java).apply {
-            putExtra(DETAIL_USER, user)
-        }
-        startActivity(intent)
+        userViewModel.onUserClick(user)
     }
 
-    private val userViewModel: UsersViewModel by viewModels {
-        UsersViewModel.UsersViewModelFactory(NetUserRepoImp())
-    }
+    private lateinit var userViewModel: UserContract.ViewModel
 
-    private lateinit var presenter: UserContract.Presenter
+    private val viewModelDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initViews()
-
-        presenter = extractPresenter()
-        presenter.attach(this)
+        initViewModel()
 
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onRetainCustomNonConfigurationInstance(): UserContract.Presenter? {
-        return presenter
+
+    override fun onDestroy() {
+        viewModelDisposable.dispose()
+        super.onDestroy()
     }
 
-    private fun extractPresenter(): UserContract.Presenter {
-        return lastCustomNonConfigurationInstance as? UserContract.Presenter
-            ?: UserPresenter(app.userRepo)
+    private fun openProfileScreen(userEntity: UserEntity) {
+        val intent = Intent(this.app, ProfileActivity::class.java).apply {
+            putExtra(DETAIL_USER, UserEntityDto.convertUserEntityToDto(userEntity))
+        }
+        startActivity(intent)
+    }
+
+    private fun getViewModel(): UserContract.ViewModel {
+        return lastCustomNonConfigurationInstance as? UserContract.ViewModel
+            ?: UsersViewModel(app.userRepo)
+    }
+
+    override fun onRetainCustomNonConfigurationInstance(): UserContract.ViewModel {
+        return userViewModel
     }
 
     private fun initViews() {
         binding.mainActivityRefreshButton.setOnClickListener {
-            this.lifecycle.coroutineScope.launchWhenStarted {
-                presenter.onRefresh()
-            }
+            userViewModel.onRefresh()
         }
         initRecycleView()
+        showProgress(false)
+
     }
 
-    private fun loadData() {
-        userViewModel.requestUserList()
+    private fun initViewModel() {
+        userViewModel = getViewModel()
 
+        viewModelDisposable.addAll(
+
+            userViewModel.progressLiveData.subscribe { showProgress(it) },
+            userViewModel.usersLiveData.subscribe {
+                showUsers(it)
+                // test(it)
+            },
+            userViewModel.usersNetUpdateLiveData.subscribe {
+                showUsers(it)
+                setCacheData(it)
+            },
+            userViewModel.errorLiveData.subscribe { showError(it) },
+            userViewModel.openProfileLiveData.subscribe { openProfileScreen(it) },
+
+            )
+    }
+
+
+    fun setCacheData(userList: List<UserEntity>) {
+        userViewModel.onSaveImage(userList)
+        userViewModel.usersBitmap.subscribe { bitmapList ->
+            var tmpUserList: MutableList<UserEntity> = mutableListOf()
+            for (i in 0..userList.size - 1) {
+                onLoadBitmap(
+                    app,
+                    bitmapList[i],
+                    userList[i].login
+                )
+                val internalPath = getImagePath(app, userList[i].login)
+                val updatedUser = UserEntity(
+                    userList[i].login,
+                    userList[i].id,
+                    "$internalPath.png",
+                    userList[i].type,
+                    userList[i].siteAdmin
+                )
+                tmpUserList.add(updatedUser)
+            }
+            updateLocalRepo(app.database, tmpUserList)
+        }
+
+    }
+
+
+    private fun updateLocalRepo(db: UserDatabase, userList: List<UserEntity>) {
+        userViewModel.onNewData(db, userList)
     }
 
 
@@ -76,16 +130,15 @@ class MainActivity : AppCompatActivity(), UserContract.View {
     }
 
 
-    override fun showUsers(users: List<UserEntity>) {
+    private fun showUsers(users: List<UserEntity>) {
         adapter.setData(users)
-
     }
 
-    override fun showError(throwable: Throwable) {
+    private fun showError(throwable: Throwable) {
         Snackbar.make(binding.root, throwable.message.toString(), Snackbar.LENGTH_SHORT).show()
     }
 
-    override fun showPorgress(inProgress: Boolean) {
+    private fun showProgress(inProgress: Boolean) {
         binding.mainActivityProgressBar.isVisible = inProgress
         binding.mainActivityRecycle.isVisible = !inProgress
     }
