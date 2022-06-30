@@ -1,11 +1,10 @@
 package com.home.gitapp.data.retrofit
 
-import com.home.gitapp.domain.UserEntity
-import retrofit2.Call
+import io.reactivex.rxjava3.core.Single
 import retrofit2.http.GET
 
 interface GithubApi {
     @GET("users")
-    fun getNetData(): Call<List<UserEntity>>
+    fun getNetData(): Single<List<UserEntityDto>>
 
 }

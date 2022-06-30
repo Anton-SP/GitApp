@@ -7,12 +7,17 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.home.gitapp.app
+import com.home.gitapp.data.retrofit.UserEntityDto
+import com.home.gitapp.data.room.UserDatabase
 import com.home.gitapp.databinding.ActivityMainBinding
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.ui.profile.ProfileActivity
 import com.home.gitapp.ui.users.UserAdapter
 import com.home.gitapp.ui.users.UserContract
 import com.home.gitapp.ui.users.UsersViewModel
+import com.home.gitapp.utils.getImagePath
+import com.home.gitapp.utils.onLoadBitmap
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 const val DETAIL_USER = "DETAIL_USER"
 
@@ -20,14 +25,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val adapter = UserAdapter { user ->
-
-        val intent = Intent(this.app, ProfileActivity::class.java).apply {
-           putExtra(DETAIL_USER, user)
-        }
-        startActivity(intent)
+        userViewModel.onUserClick(user)
     }
 
     private lateinit var userViewModel: UserContract.ViewModel
+
+    private val viewModelDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,16 +38,20 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         initViews()
         initViewModel()
+
     }
 
-    private fun initViewModel() {
-        userViewModel = getViewModel()
 
-        userViewModel.progressLiveData.observe(this) { showProgress(it) }
+    override fun onDestroy() {
+        viewModelDisposable.dispose()
+        super.onDestroy()
+    }
 
-        userViewModel.usersLiveData.observe(this) { showUsers(it) }
-
-        userViewModel.errorLiveData.observe(this) { showError(it) }
+    private fun openProfileScreen(userEntity: UserEntity) {
+        val intent = Intent(this.app, ProfileActivity::class.java).apply {
+            putExtra(DETAIL_USER, UserEntityDto.convertUserEntityToDto(userEntity))
+        }
+        startActivity(intent)
     }
 
     private fun getViewModel(): UserContract.ViewModel {
@@ -61,8 +68,59 @@ class MainActivity : AppCompatActivity() {
             userViewModel.onRefresh()
         }
         initRecycleView()
-
         showProgress(false)
+
+    }
+
+    private fun initViewModel() {
+        userViewModel = getViewModel()
+
+        viewModelDisposable.addAll(
+
+            userViewModel.progressLiveData.subscribe { showProgress(it) },
+            userViewModel.usersLiveData.subscribe {
+                showUsers(it)
+                // test(it)
+            },
+            userViewModel.usersNetUpdateLiveData.subscribe {
+                showUsers(it)
+                setCacheData(it)
+            },
+            userViewModel.errorLiveData.subscribe { showError(it) },
+            userViewModel.openProfileLiveData.subscribe { openProfileScreen(it) },
+
+            )
+    }
+
+
+    fun setCacheData(userList: List<UserEntity>) {
+        userViewModel.onSaveImage(userList)
+        userViewModel.usersBitmap.subscribe { bitmapList ->
+            var tmpUserList: MutableList<UserEntity> = mutableListOf()
+            for (i in 0..userList.size - 1) {
+                onLoadBitmap(
+                    app,
+                    bitmapList[i],
+                    userList[i].login
+                )
+                val internalPath = getImagePath(app, userList[i].login)
+                val updatedUser = UserEntity(
+                    userList[i].login,
+                    userList[i].id,
+                    "$internalPath.png",
+                    userList[i].type,
+                    userList[i].siteAdmin
+                )
+                tmpUserList.add(updatedUser)
+            }
+            updateLocalRepo(app.database, tmpUserList)
+        }
+
+    }
+
+
+    private fun updateLocalRepo(db: UserDatabase, userList: List<UserEntity>) {
+        userViewModel.onNewData(db, userList)
     }
 
 
@@ -74,7 +132,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun showUsers(users: List<UserEntity>) {
         adapter.setData(users)
-
     }
 
     private fun showError(throwable: Throwable) {
