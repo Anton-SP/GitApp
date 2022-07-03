@@ -12,13 +12,13 @@ abstract class UserDatabase : RoomDatabase() {
     companion object {
         private var INSTANCE: UserDatabase? = null
 
-        fun getDatabase(context: Context):UserDatabase{
+        fun getDatabase(context: Context): UserDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     UserDatabase::class.java,
                     "users_database"
-                ) .build()
+                ).build()
                 INSTANCE = instance
                 instance
             }

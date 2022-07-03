@@ -1,7 +1,5 @@
 package com.home.gitapp.domain
 
-import com.home.gitapp.data.room.RoomUserEntity
-
 
 data class UserEntity(
 

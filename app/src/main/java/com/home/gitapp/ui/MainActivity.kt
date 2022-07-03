@@ -65,9 +65,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        /* binding.mainActivityRefreshButton.setOnClickListener {
-             userViewModel.onRefresh()
-         }*/
+        /*    binding.mainActivityRefreshButton.setOnClickListener {
+                userViewModel.onRefresh()
+            }*/
         initRecycleView()
         showProgress(false)
 
@@ -81,9 +81,12 @@ class MainActivity : AppCompatActivity() {
             userViewModel.progressLiveData.subscribe { showProgress(it) },
             userViewModel.usersLiveData.subscribe {
                 showUsers(it)
+                checkData(it)
+
             },
             userViewModel.usersNetUpdateLiveData.subscribe {
-                showUsers(it)
+                /*   showUsers(it)
+                   setCacheData(it)*/
                 setCacheData(it)
             },
             userViewModel.errorLiveData.subscribe { showError(it) },
@@ -93,6 +96,13 @@ class MainActivity : AppCompatActivity() {
                 userViewModel.onRefresh()
             }
         )
+    }
+
+    private fun checkData(userList: List<UserEntity>) {
+        userList.let {
+            userViewModel.compareData(app.database, userList)
+        }
+
     }
 
 
