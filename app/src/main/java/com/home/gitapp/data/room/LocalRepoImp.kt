@@ -11,6 +11,5 @@ class LocalRepoImp(private val userDao: UserDao) : UserRepo {
         userDao.getAllUsers()
             .map { roomUserList -> roomUserList.map { it.convertDaoToUserEntity() } }
 
-
 }
 

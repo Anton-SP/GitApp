@@ -31,6 +31,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var userViewModel: UserContract.ViewModel
 
+    private val userRepo by lazy { app.userRepo }
+
+    private val database by lazy { app.database }
+
     private val viewModelDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,7 +61,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun getViewModel(): UserContract.ViewModel {
         return lastCustomNonConfigurationInstance as? UserContract.ViewModel
-            ?: UsersViewModel(app.userRepo)
+            ?: UsersViewModel(userRepo)
     }
 
     override fun onRetainCustomNonConfigurationInstance(): UserContract.ViewModel {
@@ -65,12 +69,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        /*    binding.mainActivityRefreshButton.setOnClickListener {
-                userViewModel.onRefresh()
-            }*/
         initRecycleView()
         showProgress(false)
-
     }
 
     private fun initViewModel() {
@@ -82,11 +82,8 @@ class MainActivity : AppCompatActivity() {
             userViewModel.usersLiveData.subscribe {
                 showUsers(it)
                 checkData(it)
-
             },
             userViewModel.usersNetUpdateLiveData.subscribe {
-                /*   showUsers(it)
-                   setCacheData(it)*/
                 setCacheData(it)
             },
             userViewModel.errorLiveData.subscribe { showError(it) },
@@ -126,7 +123,7 @@ class MainActivity : AppCompatActivity() {
                 )
                 tmpUserList.add(updatedUser)
             }
-            updateLocalRepo(app.database, tmpUserList)
+            updateLocalRepo(database, tmpUserList)
         }
 
     }
