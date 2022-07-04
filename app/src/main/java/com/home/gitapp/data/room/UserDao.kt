@@ -13,6 +13,6 @@ interface UserDao {
     fun getAllUsers(): Single<List<RoomUserEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addUserList(users:List<RoomUserEntity>)
+    fun addUserList(users: List<RoomUserEntity>)
 
 }
