@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.home.gitapp.data.room.UserDatabase
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.domain.UserRepo
@@ -20,7 +21,7 @@ import io.reactivex.rxjava3.subjects.Subject
 
 class UsersViewModel(
     private val repository: UserRepo
-) : UserContract.ViewModel {
+) : UserContract.ViewModel, ViewModel() {
 
     override val usersLiveData: Observable<List<UserEntity>> = BehaviorSubject.create()
     override val errorLiveData: Observable<Throwable> = BehaviorSubject.create()
