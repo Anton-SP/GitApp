@@ -10,7 +10,10 @@ import com.home.gitapp.app
 import com.home.gitapp.data.retrofit.UserEntityDto
 import com.home.gitapp.data.room.UserDatabase
 import com.home.gitapp.databinding.ActivityMainBinding
+import com.home.gitapp.di.AppModule
+import com.home.gitapp.di.AppModule.CacheRepo
 import com.home.gitapp.domain.UserEntity
+import com.home.gitapp.domain.UserRepo
 import com.home.gitapp.ui.profile.ProfileActivity
 import com.home.gitapp.ui.users.UserAdapter
 import com.home.gitapp.ui.users.UsersViewModel
@@ -18,8 +21,7 @@ import com.home.gitapp.utils.getImagePath
 import com.home.gitapp.utils.observableClickListener
 import com.home.gitapp.utils.onLoadBitmap
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import javax.inject.Inject
 
 
 const val DETAIL_USER = "DETAIL_USER"
@@ -31,10 +33,14 @@ class MainActivity : AppCompatActivity() {
         userViewModel.onUserClick(user)
     }
 
+    @Inject
+    lateinit var database: UserDatabase
 
-    private val database: UserDatabase by inject()
+    @Inject
+    lateinit var userRepo:@CacheRepo UserRepo
 
-    private val userViewModel: UsersViewModel by viewModel()
+    private val userViewModel:UsersViewModel by lazy { UsersViewModel(userRepo) }
+    //   private val userViewModel: UsersViewModel by viewModel()
 
     private val viewModelDisposable = CompositeDisposable()
 
@@ -42,6 +48,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        //app.appComponent.inject(this)
+
         initViews()
         initViewModel()
 
