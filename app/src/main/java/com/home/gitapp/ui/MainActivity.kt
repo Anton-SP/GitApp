@@ -10,8 +10,6 @@ import com.home.gitapp.app
 import com.home.gitapp.data.retrofit.UserEntityDto
 import com.home.gitapp.data.room.UserDatabase
 import com.home.gitapp.databinding.ActivityMainBinding
-import com.home.gitapp.di.AppModule
-import com.home.gitapp.di.AppModule.CacheRepo
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.domain.UserRepo
 import com.home.gitapp.ui.profile.ProfileActivity
@@ -20,12 +18,14 @@ import com.home.gitapp.ui.users.UsersViewModel
 import com.home.gitapp.utils.getImagePath
 import com.home.gitapp.utils.observableClickListener
 import com.home.gitapp.utils.onLoadBitmap
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import javax.inject.Inject
 
 
 const val DETAIL_USER = "DETAIL_USER"
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
@@ -36,8 +36,10 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var database: UserDatabase
 
+ //   @InterfacesBindingModule.CacheRepoImpl
+
     @Inject
-    lateinit var userRepo:@CacheRepo UserRepo
+    lateinit var userRepo: UserRepo
 
     private val userViewModel:UsersViewModel by lazy { UsersViewModel(userRepo) }
     //   private val userViewModel: UsersViewModel by viewModel()
