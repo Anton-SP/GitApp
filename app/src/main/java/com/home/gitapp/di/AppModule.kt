@@ -26,19 +26,17 @@ import javax.inject.Singleton
 class AppModule {
     private val baseUrl = "https://api.github.com/"
 
-    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.EXPRESSION)
-    @Retention(AnnotationRetention.SOURCE)
-    @Qualifier
+   /* @Qualifier
+    @Retention(AnnotationRetention.BINARY)
     annotation class RemoteRepo
 
-    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.EXPRESSION)
-    @Retention(AnnotationRetention.SOURCE)
     @Qualifier
+    @Retention(AnnotationRetention.BINARY)
     annotation class LocalRepo
 
-    @Target(AnnotationTarget.FUNCTION, AnnotationTarget.TYPE)
     @Qualifier
-    annotation class CacheRepo
+    @Retention(AnnotationRetention.BINARY)
+    annotation class CacheRepo*/
 
 
     @Provides
@@ -54,45 +52,33 @@ class AppModule {
     }
 
 
+   // @RemoteRepo
     @Provides
     @Singleton
-    fun provideDB (@ApplicationContext appContext: Context ):UserDatabase{
-        return UserDatabase.getDatabase(appContext)
-    }
-
-    @Provides
-    @Singleton
-    fun provideUserDao(userDatabase: UserDatabase):UserDao{
-        return userDatabase.userDao()
-    }
-
-    @Provides
-    @Singleton
-    @RemoteRepo
     fun provideRemoteRepo(
         githubApi: GithubApi
     ): UserRepo {
         return NetUserRepoImp(githubApi)
     }
 
+ /* //  @LocalRepo
     @Provides
     @Singleton
-    @LocalRepo
     fun provideLocalRepo(
         userDao: UserDao
     ): UserRepo {
-       return LocalRepoImp(userDao)
+        return LocalRepoImp(userDao)
     }
-
+*/
+ /*   @CacheRepo
     @Provides
     @Singleton
-    @CacheRepo
     fun provideCacheRepo(
-        localRepo:UserRepo,
-        remoteRepo: UserRepo
+        @LocalRepo localRepo: UserRepo,
+        @RemoteRepo remoteRepo: UserRepo
     ): UserRepo {
-        return CacheUsersRepoImp(@LocalRepo localRepo, @RemoteRepo remoteRepo)
-    }
+        return CacheUsersRepoImp(localRepo,remoteRepo)
+    }*/
 
 
 }
