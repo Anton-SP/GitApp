@@ -9,18 +9,10 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import javax.inject.Qualifier
-import javax.inject.Singleton
 
 @InstallIn(ActivityComponent::class)
 @Module
 abstract class InterfacesBindingModule {
-
-    @Singleton
-    @Binds
-    abstract fun bindRemoteUserRepo(imp: NetUserRepoImp): UserRepo
-
-
-/*
     @Qualifier
     annotation class RemoteRepoImpl
 
@@ -30,16 +22,16 @@ abstract class InterfacesBindingModule {
     @Qualifier
     annotation class CacheRepoImpl
 
+    @RemoteRepoImpl
+    @Binds
+    abstract fun bindRemoteUserRepo(imp: NetUserRepoImp): UserRepo
+
     @LocalRepoImpl
-    @Singleton
     @Binds
     abstract fun bindLocalUserRepo(imp: LocalRepoImp): UserRepo
 
-    @RemoteRepoImpl
-
-
     @CacheRepoImpl
-    @Singleton
     @Binds
-    abstract fun bindCacheUserRepo(imp: CacheUsersRepoImp): UserRepo*/
+    abstract fun bindCacheUserRepo(imp: CacheUsersRepoImp): UserRepo
+
 }

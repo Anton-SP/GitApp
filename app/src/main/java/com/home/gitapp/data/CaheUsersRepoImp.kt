@@ -7,7 +7,7 @@ import io.reactivex.rxjava3.core.Single
 import javax.inject.Inject
 
 @ActivityScoped
-class CacheUsersRepoImp @Inject constructor (
+class CacheUsersRepoImp @Inject constructor(
     private val localRepo: UserRepo,
     private val remoteRepo: UserRepo
 ) : UserRepo {
