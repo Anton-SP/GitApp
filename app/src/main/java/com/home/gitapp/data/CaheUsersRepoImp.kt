@@ -2,9 +2,12 @@ package com.home.gitapp.data
 
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.domain.UserRepo
+import dagger.hilt.android.scopes.ActivityScoped
 import io.reactivex.rxjava3.core.Single
+import javax.inject.Inject
 
-class CacheUsersRepoImp(
+@ActivityScoped
+class CacheUsersRepoImp @Inject constructor(
     private val localRepo: UserRepo,
     private val remoteRepo: UserRepo
 ) : UserRepo {
@@ -14,7 +17,6 @@ class CacheUsersRepoImp(
             .filter { t: List<UserEntity> -> t.isNotEmpty() }
             .first(mutableListOf())
     }
-
 
 }
 
