@@ -2,6 +2,7 @@ package com.home.gitapp.ui
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,13 +18,13 @@ import com.home.gitapp.ui.users.UsersViewModel
 import com.home.gitapp.utils.getImagePath
 import com.home.gitapp.utils.observableClickListener
 import com.home.gitapp.utils.onLoadBitmap
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 const val DETAIL_USER = "DETAIL_USER"
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
@@ -31,10 +32,7 @@ class MainActivity : AppCompatActivity() {
         userViewModel.onUserClick(user)
     }
 
-
-    private val database: UserDatabase by inject()
-
-    private val userViewModel: UsersViewModel by viewModel()
+    private val userViewModel: UsersViewModel by viewModels()
 
     private val viewModelDisposable = CompositeDisposable()
 
@@ -42,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         initViews()
         initViewModel()
 
@@ -88,7 +87,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkData(userList: List<UserEntity>) {
         userList.let {
-            userViewModel.compareData(database, userList)
+            userViewModel.compareData(app.database, userList)
         }
 
     }
@@ -114,7 +113,7 @@ class MainActivity : AppCompatActivity() {
                 )
                 tmpUserList.add(updatedUser)
             }
-            updateLocalRepo(database, tmpUserList)
+            updateLocalRepo(app.database, tmpUserList)
         }
 
     }
