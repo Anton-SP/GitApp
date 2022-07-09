@@ -2,15 +2,20 @@ package com.home.gitapp
 
 import android.app.Application
 import android.content.Context
-import com.home.gitapp.data.room.LocalRepoImp
-import com.home.gitapp.data.room.UserDatabase
+import com.example.dilibrary.Di
+import com.example.dilibrary.DiImpl
+import com.home.gitapp.di.DiModule
 
 class App : Application() {
-    //  val userRepo by lazy { FakeUsersRepoImp() }
-    //val userRepo by lazy { NetUserRepoImp() }
-    val userRepo by lazy { LocalRepoImp(database.userDao()) }
 
-    val database by lazy {UserDatabase.getDatabase(this)}
+    lateinit var di: Di
+
+    override fun onCreate() {
+        super.onCreate()
+        di = DiImpl(app).apply { DiModule(this) }
+
+    }
+
 
 }
 

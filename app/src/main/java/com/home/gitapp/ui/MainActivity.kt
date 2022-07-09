@@ -11,11 +11,13 @@ import com.home.gitapp.data.retrofit.UserEntityDto
 import com.home.gitapp.data.room.UserDatabase
 import com.home.gitapp.databinding.ActivityMainBinding
 import com.home.gitapp.domain.UserEntity
+import com.home.gitapp.domain.UserRepo
 import com.home.gitapp.ui.profile.ProfileActivity
 import com.home.gitapp.ui.users.UserAdapter
 import com.home.gitapp.ui.users.UserContract
 import com.home.gitapp.ui.users.UsersViewModel
 import com.home.gitapp.utils.getImagePath
+import com.home.gitapp.utils.observableClickListener
 import com.home.gitapp.utils.onLoadBitmap
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
@@ -29,6 +31,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var userViewModel: UserContract.ViewModel
+
+    private val userRepo by lazy { app.di.get(UserRepo::class) }
+
+    private val database by lazy { app.di.get(UserDatabase::class) }
 
     private val viewModelDisposable = CompositeDisposable()
 
@@ -56,7 +62,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun getViewModel(): UserContract.ViewModel {
         return lastCustomNonConfigurationInstance as? UserContract.ViewModel
-            ?: UsersViewModel(app.userRepo)
+            ?: UsersViewModel(userRepo)
     }
 
     override fun onRetainCustomNonConfigurationInstance(): UserContract.ViewModel {
@@ -64,12 +70,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        binding.mainActivityRefreshButton.setOnClickListener {
-            userViewModel.onRefresh()
-        }
         initRecycleView()
         showProgress(false)
-
     }
 
     private fun initViewModel() {
@@ -80,16 +82,25 @@ class MainActivity : AppCompatActivity() {
             userViewModel.progressLiveData.subscribe { showProgress(it) },
             userViewModel.usersLiveData.subscribe {
                 showUsers(it)
-                // test(it)
+                checkData(it)
             },
             userViewModel.usersNetUpdateLiveData.subscribe {
-                showUsers(it)
                 setCacheData(it)
             },
             userViewModel.errorLiveData.subscribe { showError(it) },
             userViewModel.openProfileLiveData.subscribe { openProfileScreen(it) },
 
-            )
+            binding.mainActivityRefreshButton.observableClickListener().subscribe {
+                userViewModel.onRefresh()
+            }
+        )
+    }
+
+    private fun checkData(userList: List<UserEntity>) {
+        userList.let {
+            userViewModel.compareData(app.di.get(UserDatabase::class), userList)
+        }
+
     }
 
 
@@ -113,7 +124,7 @@ class MainActivity : AppCompatActivity() {
                 )
                 tmpUserList.add(updatedUser)
             }
-            updateLocalRepo(app.database, tmpUserList)
+            updateLocalRepo(database, tmpUserList)
         }
 
     }
