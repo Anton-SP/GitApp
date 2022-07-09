@@ -2,7 +2,9 @@ package com.home.gitapp
 
 import android.app.Application
 import android.content.Context
-import com.home.gitapp.di.Di
+import com.example.dilibrary.Di
+import com.example.dilibrary.DiImpl
+import com.home.gitapp.di.DiModule
 
 class App : Application() {
 
@@ -10,7 +12,8 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        di = Di(app)
+        di = DiImpl(app).apply { DiModule(this) }
+
     }
 
 

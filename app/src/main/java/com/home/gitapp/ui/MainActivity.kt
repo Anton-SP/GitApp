@@ -11,6 +11,7 @@ import com.home.gitapp.data.retrofit.UserEntityDto
 import com.home.gitapp.data.room.UserDatabase
 import com.home.gitapp.databinding.ActivityMainBinding
 import com.home.gitapp.domain.UserEntity
+import com.home.gitapp.domain.UserRepo
 import com.home.gitapp.ui.profile.ProfileActivity
 import com.home.gitapp.ui.users.UserAdapter
 import com.home.gitapp.ui.users.UserContract
@@ -31,9 +32,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var userViewModel: UserContract.ViewModel
 
-    private val userRepo by lazy { app.di.userRepo }
+    private val userRepo by lazy { app.di.get(UserRepo::class) }
 
-    private val database by lazy { app.di.database }
+    private val database by lazy { app.di.get(UserDatabase::class) }
 
     private val viewModelDisposable = CompositeDisposable()
 
@@ -97,7 +98,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkData(userList: List<UserEntity>) {
         userList.let {
-            userViewModel.compareData(app.di.database, userList)
+            userViewModel.compareData(app.di.get(UserDatabase::class), userList)
         }
 
     }
