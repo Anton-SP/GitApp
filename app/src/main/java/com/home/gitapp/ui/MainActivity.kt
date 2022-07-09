@@ -31,9 +31,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var userViewModel: UserContract.ViewModel
 
-    private val userRepo by lazy { app.userRepo }
+    private val userRepo by lazy { app.di.userRepo }
 
-    private val database by lazy { app.database }
+    private val database by lazy { app.di.database }
 
     private val viewModelDisposable = CompositeDisposable()
 
@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkData(userList: List<UserEntity>) {
         userList.let {
-            userViewModel.compareData(app.database, userList)
+            userViewModel.compareData(app.di.database, userList)
         }
 
     }
