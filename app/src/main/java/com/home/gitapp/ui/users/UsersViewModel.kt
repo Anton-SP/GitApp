@@ -7,6 +7,7 @@ import com.home.gitapp.data.retrofit.NetUserRepoImp
 import com.home.gitapp.data.room.UserDatabase
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.domain.UserRepo
+import com.home.gitapp.utils.convertUserEntityToDAO
 import com.home.gitapp.utils.downloadImageBitmap
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -61,7 +62,7 @@ class UsersViewModel(
 
     override fun onNewData(db: UserDatabase, list: List<UserEntity>) {
         Completable.fromRunnable {
-            db.userDao().addUserList(list.map { it.convertUserEntityToDAO() })
+            db.userDao().addUserList(list.map { convertUserEntityToDAO(it) })
         }.subscribeOn(Schedulers.io())
             .subscribe()
 
@@ -107,6 +108,18 @@ class UsersViewModel(
         return this as? Subject<T>
             ?: throw IllegalStateException("It is not Mutable o_O")
     }
+
+
+/*
+
+// You can then apply all sorts of operation here
+    Subscription subscription = clickEventObservable.flatMap(*/
+/*  *//*
+);
+
+// Unsubscribe when you're done with it
+    subscription.unsubscribe();
+*/
 
 
 }
