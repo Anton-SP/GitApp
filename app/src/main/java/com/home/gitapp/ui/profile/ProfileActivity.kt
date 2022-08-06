@@ -3,7 +3,6 @@ package com.home.gitapp.ui.profile
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import coil.load
-import com.home.gitapp.app
 import com.home.gitapp.data.retrofit.UserEntityDto
 import com.home.gitapp.databinding.ActivityProfileBinding
 import com.home.gitapp.domain.UserEntity

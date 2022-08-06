@@ -2,7 +2,6 @@ package com.home.gitapp.data
 
 import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.domain.UserRepo
-import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
 
 class FakeUsersRepoImp : UserRepo {
@@ -13,16 +12,8 @@ class FakeUsersRepoImp : UserRepo {
         UserEntity("pjhyett", 3, "https://avatars.githubusercontent.com/u/3?v=4", "user", false)
     )
 
-    override fun getUsers(
-        onSuccess: (List<UserEntity>) -> Unit,
-        onError: ((Throwable) -> Unit)?
-    ) {
-        onSuccess(data)
-    }
 
     override fun getUsers(): Single<List<UserEntity>> = Single.just(data)
-
-
 
 
 }
