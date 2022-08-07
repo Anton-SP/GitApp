@@ -27,7 +27,15 @@ class UserPresenter(
     }
 
     override suspend fun onRefresh() {
-        loadData()
+      //  loadData()
+        view?.showProgress(true)
+        inProgress = true
+        userRepo.getNetData().let {
+            view?.showProgress(false)
+            view?.showUsers(it)
+            userList = it
+            inProgress = false
+        }
     }
 
     private suspend fun loadData() {
