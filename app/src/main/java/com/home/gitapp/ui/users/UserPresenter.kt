@@ -30,7 +30,7 @@ class UserPresenter(
         loadData()
     }
 
-    private suspend fun loadData() {
+     suspend fun loadData() {
         view?.showProgress(true)
         inProgress = true
         userRepo.getNetData().let {
@@ -40,5 +40,7 @@ class UserPresenter(
             inProgress = false
         }
     }
+
+
 }
 
