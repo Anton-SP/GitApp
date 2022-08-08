@@ -28,7 +28,6 @@ class UserPresenter(
 
     override suspend fun onRefresh() {
         loadData()
-
     }
 
      suspend fun loadData() {
