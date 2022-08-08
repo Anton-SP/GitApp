@@ -1,27 +1,36 @@
 package com.home.gitapp.ui.users
 
+import com.home.gitapp.domain.UserEntity
 import com.home.gitapp.domain.UserRepo
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.atLeastOnce
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyBlocking
+import org.mockito.kotlin.*
+import java.util.*
 
 class UserPresenterTest {
 
-
+    @Mock
     private lateinit var presenter: UserPresenter
 
-    private var inProgress = false
 
     @Mock
     private lateinit var userRepo: UserRepo
 
     @Mock
     private lateinit var view: UserContract.View
+
+    @Mock
+    private lateinit var userList:List<UserEntity>
+
+    private var inProgress: Boolean = false
+
+
+
 
 
     @Before
@@ -33,7 +42,7 @@ class UserPresenterTest {
 
     @Test
     fun onRefresh_Test() {
-     //   val mockPresenter = mock(UserPresenter::class)
+
         val presenter = mock<UserPresenter>()
         runBlocking {
 
@@ -42,28 +51,33 @@ class UserPresenterTest {
         runBlocking {
             presenter.onRefresh()
         }
-        verifyBlocking(presenter, atLeastOnce()){onRefresh()}
+        verifyBlocking(presenter, atLeastOnce()) { onRefresh() }
+    }
 
-        //runBlocking { verify(presenter) }
+    @Test
+    fun verifyNetDataCall_Test(){
 
+       runBlocking {
+           Mockito.`when`(userRepo.getNetData()).thenReturn(userList)
+           presenter.onRefresh()
+       }
+
+        runBlocking {
+            verifyBlocking(userRepo, atLeastOnce()){getNetData()}
+        }
 
     }
 
-/*
- @Test
-    fun verifySuspendFunctionCalled() {
-        /* Given */
-        val m = mock<SomeInterface>()
-
-        /* When */
-        runBlocking { m.suspending() }
-
-        /* Then */
-        runBlocking { verify(m).suspending() }
+    @Test
+    fun attach_Test(){
+        val view = mock<UserContract.View>()
+        Mockito.doNothing().`when`(view).showProgress(inProgress)
+        Mockito.doNothing().`when`(view).showUsers(userList)
+        presenter.attach(view)
+        verify(view, times(2))
     }
 
 
-*/
 
 
 }
